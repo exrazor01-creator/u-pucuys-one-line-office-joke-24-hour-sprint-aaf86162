@@ -3,9 +3,12 @@
 The line plays on the classic team-building trust fall: the setup sounds
 like a wholesome success story, then the punchline splits the fallout in
 two — HR catches the legal paperwork, and the narrator catches the floor.
-It is the sort of line you send a colleague after a meeting that should
-have been an email: short, specific to office life, and it lands on the
-last three words.
+It works because the first half primes a warm, corporate-approved outcome
+("went well") and the second half reuses the verb "caught" with opposite
+fates, so the faller and the liability both land exactly where office
+rituals promise they won't. It is the sort of line you send a colleague
+after a meeting that should have been an email: short, specific to office
+life, and it lands on the last three words.
 """
 
 ENTRY = "Our trust fall exercise went well — HR caught the lawsuit, and I caught the floor."
@@ -18,18 +21,19 @@ def validate(text):
     """Gate the entry: 1-200 chars, single line, no control chars,
     no leading/trailing space, valid UTF-8. Exits non-zero otherwise."""
     if not isinstance(text, str):
-        raise SystemExit("entry must be a string")
+        raise SystemExit("entry must be a string, got %s" % type(text).__name__)
     text.encode("utf-8")  # raises UnicodeEncodeError if not valid UTF-8
     if not MIN_CHARS <= len(text) <= MAX_CHARS:
-        raise SystemExit("entry must be %d-%d characters, got %d" % (MIN_CHARS, MAX_CHARS, len(text)))
+        raise SystemExit("entry length rule violated: must be %d-%d characters, got %d" % (MIN_CHARS, MAX_CHARS, len(text)))
     if "\n" in text or "\r" in text:
-        raise SystemExit("entry must be a single line")
+        raise SystemExit("entry must be a single line, but contains a line break")
     if any(ord(ch) < 32 or ord(ch) == 127 for ch in text):
-        raise SystemExit("entry must not contain control characters")
+        bad = [repr(ch) for ch in text if ord(ch) < 32 or ord(ch) == 127]
+        raise SystemExit("entry must not contain control characters, found %s" % ", ".join(bad))
     if text != text.strip():
-        raise SystemExit("entry must not have leading or trailing space")
+        raise SystemExit("entry must not have leading or trailing space, got %r" % text)
     if not text.strip():
-        raise SystemExit("entry must not be only whitespace")
+        raise SystemExit("entry must not be only whitespace, got %r" % text)
     return text
 
 
